@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BatchConnect</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<style>
+
+/* ─────────────────────────────────────────────
+   DESIGN TOKENS  —  8pt grid  ·  MD3 base
+───────────────────────────────────────────── */
+:root{
+  /* Primary palette */
+  --p0:#ffffff;
+  --p10:#f5f0ff;
+  --p20:#ede4ff;
+  --p30:#d4bbff;
+  --p40:#ba91ff;
+  --p50:#9f6aff;
+  --p60:#8748f5;
+  --p70:#7228e8; /* primary */
+  --p80:#5c0ed4;
+  --p90:#3d0099;
+
+  /* Neutral palette */
+  --n0:#ffffff;
+  --n5:#f9f8fb;
+  --n10:#f3f1f7;
+  --n20:#e8e4f0;
+  --n30:#cdc8da;
+  --n40:#b0a9bf;
+  --n50:#948da3;
+  --n60:#7b7390;
+  --n70:#625c7a;
+  --n80:#494464;
+  --n90:#312d4f;
+  --n95:#1e1a38;
+  --n99:#0f0c24;
+
+  /* Semantic tokens */
+  --color-primary:         #7228e8;
+  --color-primary-dim:     #ede4ff;
+  --color-primary-mid:     #ba91ff;
+  --color-on-primary:      #ffffff;
+
+  --color-surface:         #ffffff;
+  --color-surface-low:     #f9f8fb;
+  --color-surface-mid:     #f3f1f7;
+  --color-surface-high:    #e8e4f0;
+
+  --color-on-surface:      #1a1635;
+  --color-on-surface-med:  #4b4669;
+  --color-on-surface-low:  #8e89a8;
+  --color-on-surface-min:  #cdc8da;
+
+  --color-outline:         #d0cbe0;
+  --color-outline-med:     #e8e4f0;
+
+  --color-success:         #12805c;
+  --color-success-dim:     #e6f4f0;
+  --color-warning:         #a35c00;
+  --color-warning-dim:     #fff4e0;
+  --color-danger:          #b91c3a;
+  --color-danger-dim:      #fdeef1;
+  --color-info:            #1d5aa3;
+  --color-info-dim:        #e8f1fb;
+
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* Spacing (8pt) */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
+  --sp-9: 36px; --sp-10: 40px; --sp-12: 48px; --sp-14: 56px;
+
+  /* Radii */
+  --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+  --r-xl: 20px; --r-2xl: 28px; --r-full: 9999px;
+
+  /* Elevation */
+  --el-1: 0 1px 2px rgba(18,14,50,0.06), 0 1px 4px rgba(18,14,50,0.04);
+  --el-2: 0 2px 8px rgba(18,14,50,0.08), 0 1px 3px rgba(18,14,50,0.05);
+  --el-3: 0 4px 16px rgba(18,14,50,0.10), 0 2px 6px rgba(18,14,50,0.06);
+}
+
+/* ─────────────────────────────────────────────
+   RESET
+───────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{
+  font-family:var(--font-body);
+  background: #e4e0f0;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;padding:32px 16px;
+}
+
+/* ─────────────────────────────────────────────
+   PHONE FRAME
+───────────────────────────────────────────── */
+.phone{
+  width:393px;height:852px;
+  background:var(--color-surface-low);
+  border-radius:52px;position:relative;overflow:hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.6) inset,
+    0 0 0 10px #2a2145,
+    0 0 0 11px rgba(255,255,255,0.06),
+    0 32px 80px rgba(15,12,36,0.5),
+    0 8px 24px rgba(15,12,36,0.3);
+}
+.pill{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  width:124px;height:36px;background:#1a1635;border-radius:22px;z-index:200;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.pill-camera{width:12px;height:12px;border-radius:50%;background:#0c0920;border:1.5px solid #2a2550;}
+.pill-mic{width:54px;height:5px;border-radius:3px;background:#0c0920;}
+
+/* ─────────────────────────────────────────────
+   SCREEN SYSTEM
+───────────────────────────────────────────── */
+.screen{
+  position:absolute;inset:0;display:none;
+  flex-direction:column;background:var(--color-surface-low);
+}
+.screen.active{display:flex;}
+.scroll{flex:1;overflow-y:auto;scrollbar-width:none;}
+.scroll::-webkit-scrollbar{display:none;}
+
+/* ─────────────────────────────────────────────
+   STATUS BAR
+───────────────────────────────────────────── */
+.status{
+  height:52px;padding:16px var(--sp-6) 0;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;background:var(--color-surface);
+}
+.status-t{font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--color-on-surface);}
+.status-r{display:flex;align-items:center;gap:5px;}
+.status-r .mi{font-size:15px;color:var(--color-on-surface);}
+
+/* ─────────────────────────────────────────────
+   TOP APP BAR  (MD3 Small)
+───────────────────────────────────────────── */
+.top-app-bar{
+  display:flex;align-items:center;gap:var(--sp-1);
+  padding:var(--sp-1) var(--sp-2) var(--sp-2);
+  background:var(--color-surface);
+  flex-shrink:0;min-height:56px;
+}
+.tab-title{
+  font-family:var(--font-display);font-size:22px;font-weight:700;
+  color:var(--color-on-surface);flex:1;padding:0 var(--sp-2);
+  letter-spacing:-0.3px;
+}
+.tab-title-sm{
+  font-family:var(--font-display);font-size:16px;font-weight:600;
+  color:var(--color-on-surface);flex:1;padding:0 var(--sp-2);
+}
+.ib{ /* icon button */
+  width:48px;height:48px;border-radius:var(--r-full);border:none;background:transparent;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  position:relative;overflow:hidden;transition:background 0.18s;
+}
+.ib:hover{background:rgba(114,40,232,0.07);}
+.ib:active{background:rgba(114,40,232,0.14);}
+.ib .mi{font-size:24px;color:var(--color-on-surface-med);}
+.ib-badge{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--color-danger);border:1.5px solid var(--color-surface);}
+
+/* ─────────────────────────────────────────────
+   NAVIGATION BAR  (MD3)
+───────────────────────────────────────────── */
+.nav-bar{
+  display:flex;align-items:center;
+  background:var(--color-surface);
+  border-top:1px solid var(--color-outline-med);
+  padding:0 var(--sp-2) var(--sp-4);
+  height:80px;flex-shrink:0;
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;padding:var(--sp-2) 0;
+}
+.nav-pill{
+  width:64px;height:32px;border-radius:var(--r-full);
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.18s;
+}
+.nav-item.on .nav-pill{background:var(--color-primary-dim);}
+.nav-pill .mi{font-size:24px;color:var(--color-on-surface-low);transition:color 0.18s;}
+.nav-item.on .nav-pill .mi{color:var(--color-primary);}
+.nav-lbl{font-family:var(--font-body);font-size:12px;font-weight:500;color:var(--color-on-surface-low);transition:color 0.18s;letter-spacing:0.2px;}
+.nav-item.on .nav-lbl{color:var(--color-on-surface);font-weight:600;}
+
+/* ─────────────────────────────────────────────
+   DIVIDER
+───────────────────────────────────────────── */
+.div{height:1px;background:var(--color-outline-med);}
+.div-i{height:1px;background:var(--color-outline-med);margin-left:72px;}
+
+/* ─────────────────────────────────────────────
+   BUTTONS  (MD3 scale)
+───────────────────────────────────────────── */
+.btn-f{ /* filled */
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  height:40px;padding:0 var(--sp-6);border-radius:var(--r-full);border:none;
+  background:var(--color-primary);color:var(--color-on-primary);
+  font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;
+  letter-spacing:0.1px;transition:box-shadow 0.18s,opacity 0.18s;
+}
+.btn-f:hover{box-shadow:0 2px 12px rgba(114,40,232,0.35);}
+.btn-f .mi{font-size:18px;}
+.btn-t{ /* tonal */
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  height:40px;padding:0 var(--sp-5);border-radius:var(--r-full);border:none;
+  background:var(--color-primary-dim);color:var(--color-primary);
+  font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;
+  letter-spacing:0.1px;
+}
+.btn-t .mi{font-size:18px;}
+.btn-o{ /* outlined */
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  height:40px;padding:0 var(--sp-5);border-radius:var(--r-full);
+  border:1.5px solid var(--color-outline);background:transparent;
+  color:var(--color-primary);font-family:var(--font-body);font-size:14px;
+  font-weight:500;cursor:pointer;letter-spacing:0.1px;
+}
+.btn-o .mi{font-size:18px;}
+.btn-txt{ /* text button */
+  display:inline-flex;align-items:center;gap:4px;height:40px;padding:0 var(--sp-3);
+  border-radius:var(--r-full);border:none;background:transparent;
+  color:var(--color-primary);font-family:var(--font-body);
+  font-size:14px;font-weight:600;cursor:pointer;
+}
+
+/* ─────────────────────────────────────────────
+   SEARCH BAR  (MD3)
+───────────────────────────────────────────── */
+.search-bar{
+  display:flex;align-items:center;gap:var(--sp-3);
+  background:var(--color-surface-mid);border-radius:var(--r-full);
+  height:56px;padding:0 var(--sp-4) 0 var(--sp-4);
+  margin:0 var(--sp-4) var(--sp-3);
+}
+.search-bar .mi{font-size:22px;color:var(--color-on-surface-med);}
+.search-inp{
+  flex:1;border:none;background:transparent;outline:none;
+  font-family:var(--font-body);font-size:16px;color:var(--color-on-surface);
+}
+.search-inp::placeholder{color:var(--color-on-surface-low);}
+
+/* ─────────────────────────────────────────────
+   CHIPS  (MD3 Filter)
+───────────────────────────────────────────── */
+.chip-row{display:flex;gap:var(--sp-2);padding:0 var(--sp-4) var(--sp-3);overflow-x:auto;scrollbar-width:none;}
+.chip-row::-webkit-scrollbar{display:none;}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  height:32px;padding:0 var(--sp-3);white-space:nowrap;
+  border-radius:var(--r-xs);border:1px solid var(--color-outline);
+  background:transparent;color:var(--color-on-surface-med);
+  font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;
+  transition:all 0.18s;
+}
+.chip .mi{font-size:17px;}
+.chip.sel{
+  background:var(--color-primary-dim);border-color:transparent;
+  color:var(--color-primary);
+}
+
+/* ─────────────────────────────────────────────
+   BADGE
+───────────────────────────────────────────── */
+.badge{
+  background:var(--color-primary);color:#fff;
+  min-width:20px;height:20px;border-radius:var(--r-full);
+  font-size:11px;font-weight:700;font-family:var(--font-display);
+  display:flex;align-items:center;justify-content:center;padding:0 6px;
+}
+
+/* ─────────────────────────────────────────────
+   AVATAR SYSTEM
+───────────────────────────────────────────── */
+.av{
+  border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;flex-shrink:0;letter-spacing:0.3px;
+}
+.av-36{width:36px;height:36px;font-size:13px;}
+.av-40{width:40px;height:40px;font-size:14px;}
+.av-48{width:48px;height:48px;font-size:16px;}
+.av-56{width:56px;height:56px;font-size:18px;}
+.av-88{width:88px;height:88px;font-size:28px;}
+.av-purple{background:var(--color-primary-dim);color:var(--color-primary);}
+.av-green{background:#e0f4ee;color:#0d6b4a;}
+.av-amber{background:#fff0d9;color:#9c5400;}
+.av-rose{background:#fce8ed;color:#9e1831;}
+.av-sky{background:#dff0fd;color:#0a5da0;}
+.av-indigo{background:#e9e8fd;color:#2c2aaa;}
+.av-teal{background:#dcf4f0;color:#0a6e62;}
+.av-group{border-radius:var(--r-md);}
+.online-dot{
+  position:absolute;bottom:1px;right:1px;
+  width:11px;height:11px;border-radius:50%;
+  background:var(--color-success);
+  border:2px solid var(--color-surface);
+}
+
+/* ─────────────────────────────────────────────
+   SECTION LABEL
+───────────────────────────────────────────── */
+.sec-lbl{
+  font-family:var(--font-display);font-size:11px;font-weight:700;
+  letter-spacing:0.8px;text-transform:uppercase;
+  color:var(--color-primary);padding:var(--sp-4) var(--sp-4) var(--sp-2);
+}
+
+/* ─────────────────────────────────────────────
+   TABS  (MD3)
+───────────────────────────────────────────── */
+.tab-row{display:flex;border-bottom:1px solid var(--color-outline-med);}
+.tab{
+  flex:1;height:48px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-body);font-size:13px;font-weight:600;
+  color:var(--color-on-surface-low);cursor:pointer;
+  border:none;background:transparent;border-bottom:2px solid transparent;
+  letter-spacing:0.1px;transition:all 0.18s;
+}
+.tab.on{color:var(--color-primary);border-bottom-color:var(--color-primary);}
+
+/* ─────────────────────────────────────────────
+   SWITCH  (MD3)
+───────────────────────────────────────────── */
+.sw{
+  width:52px;height:32px;border-radius:var(--r-full);
+  background:var(--color-primary);position:relative;cursor:pointer;
+  transition:background 0.2s;border:none;flex-shrink:0;
+}
+.sw::after{
+  content:'';position:absolute;top:4px;right:4px;
+  width:24px;height:24px;border-radius:50%;background:#fff;
+  transition:transform 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.2);
+}
+.sw.off{background:var(--color-outline);}
+.sw.off::after{transform:translateX(-20px);}
+
+/* ─────────────────────────────────────────────
+   OTP FIELDS
+───────────────────────────────────────────── */
+.otp-row{display:flex;gap:10px;justify-content:center;padding:var(--sp-8) var(--sp-8);}
+.otp-b{
+  width:52px;height:60px;border-radius:var(--r-sm);
+  border:1.5px solid var(--color-outline);background:var(--color-surface-mid);
+  font-family:var(--font-display);font-size:24px;font-weight:700;
+  color:var(--color-on-surface);text-align:center;outline:none;
+  transition:border-color 0.18s;
+}
+.otp-b:focus{border-color:var(--color-primary);background:var(--color-surface);}
+
+/* ─────────────────────────────────────────────
+   TEXT FIELD  (outlined MD3)
+───────────────────────────────────────────── */
+.field-o{
+  width:100%;border:1.5px solid var(--color-outline);border-radius:var(--r-xs);
+  background:transparent;padding:14px var(--sp-4);
+  font-family:var(--font-body);font-size:16px;color:var(--color-on-surface);
+  outline:none;transition:border-color 0.18s;
+}
+.field-o:focus{border-color:var(--color-primary);}
+.field-o::placeholder{color:var(--color-on-surface-low);}
+.field-wrap{display:flex;flex-direction:column;gap:6px;margin-bottom:var(--sp-4);}
+.field-label{font-family:var(--font-body);font-size:12px;font-weight:600;color:var(--color-on-surface-med);text-transform:uppercase;letter-spacing:0.6px;}
+
+/* ─────────────────────────────────────────────
+   CARDS
+───────────────────────────────────────────── */
+.card{
+  margin:0 var(--sp-4) var(--sp-3);
+  background:var(--color-surface);border-radius:var(--r-xl);
+  border:1px solid var(--color-outline-med);overflow:hidden;
+}
+.card-filled{
+  margin:0 var(--sp-4) var(--sp-3);
+  background:var(--color-surface-mid);border-radius:var(--r-xl);overflow:hidden;
+}
+
+/* ─────────────────────────────────────────────
+   LIST ITEM  (MD3 72px tall)
+───────────────────────────────────────────── */
+.li{
+  display:flex;align-items:center;gap:var(--sp-4);
+  padding:var(--sp-3) var(--sp-4);min-height:72px;
+  cursor:pointer;transition:background 0.15s;
+}
+.li:hover{background:rgba(114,40,232,0.04);}
+.li-text{flex:1;min-width:0;}
+.li-head{font-family:var(--font-body);font-size:16px;font-weight:500;color:var(--color-on-surface);}
+.li-sub{font-family:var(--font-body);font-size:14px;color:var(--color-on-surface-low);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.li-trail{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+.li-time{font-family:var(--font-body);font-size:12px;color:var(--color-on-surface-low);}
+
+/* ─────────────────────────────────────────────
+   SKILL TAG
+───────────────────────────────────────────── */
+.skill{
+  display:inline-flex;align-items:center;height:22px;padding:0 8px;
+  border-radius:var(--r-xs);border:1px solid var(--color-outline);
+  font-family:var(--font-body);font-size:11px;font-weight:500;
+  color:var(--color-on-surface-med);
+}
+
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────────── */
+@keyframes slideUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.screen.active .a{animation:slideUp 0.3s cubic-bezier(.22,.68,0,1.2) both;}
+.d0{animation-delay:0s;}.d1{animation-delay:.05s;}.d2{animation-delay:.10s;}
+.d3{animation-delay:.15s;}.d4{animation-delay:.20s;}.d5{animation-delay:.25s;}.d6{animation-delay:.30s;}
+
+/* ─────────────────────────────────────────────
+   POST CARD  (bespoke)
+───────────────────────────────────────────── */
+.post-head{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-4) var(--sp-4) var(--sp-3);}
+.post-author{font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--color-on-surface);}
+.post-meta{font-size:12px;color:var(--color-on-surface-low);margin-top:1px;}
+.post-body{padding:0 var(--sp-4) var(--sp-4);}
+.post-tag{
+  display:inline-flex;align-items:center;height:24px;padding:0 10px;
+  border-radius:var(--r-xs);background:var(--color-primary-dim);
+  font-family:var(--font-body);font-size:11px;font-weight:600;
+  color:var(--color-primary);letter-spacing:0.2px;margin-bottom:var(--sp-2);
+}
+.post-text{font-family:var(--font-body);font-size:14px;line-height:1.6;color:var(--color-on-surface-med);}
+.post-img{width:100%;height:188px;background:var(--color-surface-mid);display:flex;align-items:center;justify-content:center;}
+.post-img-inner{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);}
+.post-img-inner .mi{font-size:40px;color:var(--color-on-surface-min);}
+.post-img-inner span{font-size:12px;color:var(--color-on-surface-low);}
+.post-actions{display:flex;border-top:1px solid var(--color-outline-med);}
+.post-act{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  height:44px;border:none;background:transparent;cursor:pointer;
+  font-family:var(--font-body);font-size:13px;font-weight:500;
+  color:var(--color-on-surface-low);transition:color 0.15s,background 0.15s;
+}
+.post-act:hover{background:rgba(114,40,232,0.05);color:var(--color-primary);}
+.post-act .mi{font-size:18px;}
+.post-act.liked{color:var(--color-danger);}
+.post-act+.post-act{border-left:1px solid var(--color-outline-med);}
+
+/* ─────────────────────────────────────────────
+   STAT ROW
+───────────────────────────────────────────── */
+.stat-row{display:flex;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--color-outline-med);margin-bottom:var(--sp-6);}
+.stat-cell{flex:1;padding:var(--sp-4);text-align:center;background:var(--color-surface);}
+.stat-cell+.stat-cell{border-left:1px solid var(--color-outline-med);}
+.stat-n{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--color-primary);}
+.stat-l{font-family:var(--font-body);font-size:11px;font-weight:500;color:var(--color-on-surface-low);margin-top:3px;text-transform:uppercase;letter-spacing:0.4px;}
+
+/* ─────────────────────────────────────────────
+   NOTIFICATION ITEM
+───────────────────────────────────────────── */
+.notif{
+  display:flex;align-items:flex-start;gap:var(--sp-4);
+  padding:var(--sp-4);cursor:pointer;transition:background 0.15s;
+  position:relative;
+}
+.notif:hover{background:rgba(114,40,232,0.04);}
+.notif.unread::after{
+  content:'';position:absolute;left:6px;top:22px;
+  width:6px;height:6px;border-radius:50%;background:var(--color-primary);
+}
+.notif-icon{
+  width:44px;height:44px;border-radius:var(--r-full);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.notif-icon .mi{font-size:20px;}
+.notif-icon.n-bday{background:var(--color-warning-dim);}
+.notif-icon.n-bday .mi{color:var(--color-warning);}
+.notif-icon.n-msg{background:var(--color-primary-dim);}
+.notif-icon.n-msg .mi{color:var(--color-primary);}
+.notif-icon.n-like{background:var(--color-danger-dim);}
+.notif-icon.n-like .mi{color:var(--color-danger);}
+.notif-icon.n-event{background:var(--color-info-dim);}
+.notif-icon.n-event .mi{color:var(--color-info);}
+.notif-icon.n-sos{background:var(--color-danger-dim);}
+.notif-icon.n-sos .mi{color:var(--color-danger);}
+.notif-icon.n-ok{background:var(--color-success-dim);}
+.notif-icon.n-ok .mi{color:var(--color-success);}
+.notif-body{flex:1;}
+.notif-text{font-family:var(--font-body);font-size:14px;color:var(--color-on-surface);line-height:1.5;}
+.notif-text strong{font-weight:600;color:var(--color-on-surface);}
+.notif-time{font-size:12px;color:var(--color-on-surface-low);margin-top:3px;}
+
+/* ─────────────────────────────────────────────
+   HERO CARD  (home)
+───────────────────────────────────────────── */
+.hero{
+  margin:var(--sp-2) var(--sp-4) var(--sp-4);
+  border-radius:var(--r-2xl);padding:var(--sp-6);
+  background:var(--color-primary);color:#fff;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,0.07);
+}
+.hero-sup{
+  font-family:var(--font-body);font-size:11px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;
+  opacity:0.75;margin-bottom:4px;display:flex;align-items:center;gap:6px;
+}
+.hero-sup .mi{font-size:14px;}
+.hero-title{font-family:var(--font-display);font-size:22px;font-weight:800;margin-bottom:var(--sp-5);letter-spacing:-0.3px;}
+.hero-stats{display:flex;gap:var(--sp-6);}
+.h-stat-n{font-family:var(--font-display);font-size:26px;font-weight:800;line-height:1;}
+.h-stat-l{font-size:11px;font-weight:500;opacity:0.7;margin-top:3px;text-transform:uppercase;letter-spacing:0.4px;}
+
+/* ─────────────────────────────────────────────
+   QUICK ACCESS GRID
+───────────────────────────────────────────── */
+.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);padding:0 var(--sp-2) var(--sp-2);}
+.qa-item{
+  display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);
+  padding:var(--sp-3) var(--sp-2);cursor:pointer;border-radius:var(--r-lg);
+  transition:background 0.15s;
+}
+.qa-item:hover{background:rgba(114,40,232,0.06);}
+.qa-icon{
+  width:52px;height:52px;border-radius:var(--r-lg);
+  background:var(--color-surface-mid);border:1px solid var(--color-outline-med);
+  display:flex;align-items:center;justify-content:center;transition:all 0.18s;
+}
+.qa-item:hover .qa-icon{background:var(--color-primary-dim);border-color:transparent;}
+.qa-icon .mi{font-size:24px;color:var(--color-on-surface-med);}
+.qa-item:hover .qa-icon .mi{color:var(--color-primary);}
+.qa-lbl{font-family:var(--font-body);font-size:11px;font-weight:500;color:var(--color-on-surface-low);text-align:center;}
+
+/* ─────────────────────────────────────────────
+   BIRTHDAY CARD
+───────────────────────────────────────────── */
+.bday-card{
+  margin:0 var(--sp-4) var(--sp-3);
+  border-radius:var(--r-xl);background:var(--color-warning-dim);
+  border:1px solid rgba(163,92,0,0.12);padding:var(--sp-4);
+}
+.bday-head{
+  display:flex;align-items:center;gap:var(--sp-2);
+  margin-bottom:var(--sp-3);
+}
+.bday-head .mi{font-size:18px;color:var(--color-warning);}
+.bday-head-t{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--color-warning);}
+.bday-row{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) 0;}
+.bday-row+.bday-row{border-top:1px solid rgba(163,92,0,0.10);}
+.bday-name{font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--n90);flex:1;}
+.bday-sub{font-size:12px;color:var(--color-warning);margin-top:1px;}
+
+/* ─────────────────────────────────────────────
+   PROFILE SCREEN
+───────────────────────────────────────────── */
+.cover{
+  height:160px;
+  background:linear-gradient(135deg, #5c0ed4 0%, #7228e8 45%, #9f6aff 100%);
+  position:relative;flex-shrink:0;
+}
+.cover-av{
+  position:absolute;bottom:-44px;left:var(--sp-6);
+  border:3px solid var(--color-surface-low);border-radius:var(--r-full);
+}
+.cover-edit{position:absolute;bottom:var(--sp-4);right:var(--sp-4);}
+.profile-body{padding:var(--sp-12) var(--sp-6) var(--sp-5);}
+.prof-name{font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--color-on-surface);margin-bottom:3px;letter-spacing:-0.2px;}
+.prof-role{font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--color-primary);margin-bottom:var(--sp-3);}
+.prof-bio{font-family:var(--font-body);font-size:14px;line-height:1.6;color:var(--color-on-surface-med);margin-bottom:var(--sp-4);}
+.prof-chips{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-bottom:var(--sp-5);}
+.prof-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  height:30px;padding:0 var(--sp-3);border-radius:var(--r-xs);
+  background:var(--color-surface-mid);border:1px solid var(--color-outline-med);
+  font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--color-on-surface-med);
+}
+.prof-chip .mi{font-size:14px;color:var(--color-primary);}
+
+/* INFO CARD */
+.info-card{margin:0 var(--sp-4) var(--sp-3);border-radius:var(--r-xl);border:1px solid var(--color-outline-med);background:var(--color-surface);overflow:hidden;}
+.info-card-head{
+  display:flex;align-items:center;gap:var(--sp-3);
+  padding:var(--sp-4) var(--sp-4) var(--sp-3);
+  border-bottom:1px solid var(--color-outline-med);
+}
+.info-card-head .mi{font-size:20px;color:var(--color-primary);}
+.info-card-title{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--color-on-surface);}
+.info-row{
+  display:flex;align-items:center;gap:var(--sp-4);
+  padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--color-outline-med);
+}
+.info-row:last-child{border-bottom:none;}
+.info-icon{
+  width:36px;height:36px;border-radius:var(--r-full);
+  background:var(--color-surface-mid);display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.info-icon .mi{font-size:18px;color:var(--color-on-surface-med);}
+.info-lbl{font-family:var(--font-body);font-size:11px;font-weight:500;color:var(--color-on-surface-low);text-transform:uppercase;letter-spacing:0.5px;}
+.info-val{font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--color-on-surface);}
+
+/* SETTINGS ROW */
+.set-row{display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--color-outline-med);}
+.set-row:last-child{border-bottom:none;}
+.set-icon{width:36px;height:36px;border-radius:var(--r-full);background:var(--color-surface-mid);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.set-icon .mi{font-size:18px;color:var(--color-on-surface-med);}
+.set-text{flex:1;}
+.set-t{font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--color-on-surface);}
+.set-s{font-family:var(--font-body);font-size:12px;color:var(--color-on-surface-low);}
+
+/* CHAT DETAIL */
+.msg-top{
+  background:var(--color-surface);border-bottom:1px solid var(--color-outline-med);
+  padding:var(--sp-12) var(--sp-2) var(--sp-2);
+  display:flex;align-items:center;gap:var(--sp-1);flex-shrink:0;
+}
+.msg-area{flex:1;overflow-y:auto;padding:var(--sp-4);display:flex;flex-direction:column;gap:2px;scrollbar-width:none;}
+.msg-area::-webkit-scrollbar{display:none;}
+.bubble{max-width:73%;padding:10px var(--sp-4);border-radius:20px;font-family:var(--font-body);font-size:14px;line-height:1.55;}
+.bubble.r{background:var(--color-surface-mid);color:var(--color-on-surface);border-bottom-left-radius:4px;align-self:flex-start;}
+.bubble.s{background:var(--color-primary-dim);color:var(--color-on-surface);border-bottom-right-radius:4px;align-self:flex-end;}
+.bub-t{font-family:var(--font-body);font-size:11px;color:var(--color-on-surface-low);margin:2px 4px 8px;}
+.bub-t.sr{text-align:right;}
+.date-sep{
+  text-align:center;align-self:center;
+  font-family:var(--font-body);font-size:11px;font-weight:600;
+  color:var(--color-on-surface-low);letter-spacing:0.4px;
+  background:var(--color-surface-mid);padding:4px 14px;
+  border-radius:var(--r-full);margin:var(--sp-3) 0;
+}
+.msg-compose{
+  background:var(--color-surface);border-top:1px solid var(--color-outline-med);
+  padding:var(--sp-2) var(--sp-2) var(--sp-5);
+  display:flex;align-items:center;gap:var(--sp-1);flex-shrink:0;
+}
+.compose-field{
+  flex:1;background:var(--color-surface-mid);border:none;border-radius:24px;
+  padding:10px var(--sp-5);font-family:var(--font-body);font-size:16px;
+  color:var(--color-on-surface);outline:none;
+}
+.compose-field::placeholder{color:var(--color-on-surface-low);}
+.send-btn{
+  width:44px;height:44px;border-radius:var(--r-full);border:none;
+  background:var(--color-primary);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(114,40,232,0.35);
+}
+.send-btn .mi{font-size:20px;color:#fff;}
+
+/* SOS CARD */
+.sos-card{
+  margin:0 var(--sp-4) var(--sp-4);border-radius:var(--r-xl);
+  background:var(--color-danger-dim);border:1px solid rgba(185,28,58,0.12);
+  padding:var(--sp-5);display:flex;gap:var(--sp-4);align-items:flex-start;
+}
+.sos-icon-box{
+  width:48px;height:48px;border-radius:var(--r-full);
+  background:rgba(185,28,58,0.12);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sos-icon-box .mi{font-size:24px;color:var(--color-danger);}
+.sos-t{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--color-danger);margin-bottom:3px;}
+.sos-s{font-family:var(--font-body);font-size:13px;color:var(--color-danger);opacity:0.8;margin-bottom:var(--sp-3);}
+
+/* LOGIN */
+.login-screen{
+  background:linear-gradient(165deg,#f0e9ff 0%,var(--color-surface) 45%,#ede8ff 100%);
+  overflow-y:auto;scrollbar-width:none;
+}
+.login-hero{
+  display:flex;flex-direction:column;align-items:center;
+  padding:60px var(--sp-8) var(--sp-8);text-align:center;
+}
+.app-mark{
+  width:72px;height:72px;border-radius:22px;
+  background:var(--color-primary);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(114,40,232,0.3);margin-bottom:var(--sp-5);
+}
+.app-mark .mi{font-size:36px;color:#fff;}
+.app-name{font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--color-on-surface);margin-bottom:var(--sp-2);letter-spacing:-0.5px;}
+.app-tagline{font-family:var(--font-body);font-size:15px;color:var(--color-on-surface-med);line-height:1.5;}
+.login-form{padding:0 var(--sp-8) var(--sp-8);}
+.form-separator{display:flex;align-items:center;gap:var(--sp-4);margin:var(--sp-5) 0;}
+.sep-line{flex:1;height:1px;background:var(--color-outline-med);}
+.sep-text{font-family:var(--font-body);font-size:12px;font-weight:500;color:var(--color-on-surface-low);}
+.secure-note{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:var(--sp-5);}
+.secure-note .mi{font-size:14px;color:var(--color-on-surface-low);}
+.secure-note span{font-size:12px;color:var(--color-on-surface-low);}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="pill">
+    <div class="pill-camera"></div>
+    <div class="pill-mic"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 1 — LOGIN
+  ══════════════════════════════════════════ -->
+  <div class="screen active login-screen" id="s-login">
+    <div class="login-hero">
+      <div class="app-mark a d0"><span class="material-icons-round mi">school</span></div>
+      <div class="app-name a d1">BatchConnect</div>
+      <div class="app-tagline a d2">Your private university batch community.<br>Stay connected, always.</div>
+    </div>
+    <div class="login-form">
+      <div class="field-wrap a d2">
+        <label class="field-label">Phone Number</label>
+        <input class="field-o" type="tel" placeholder="+94 7X XXX XXXX">
+      </div>
+      <div class="field-wrap a d3">
+        <label class="field-label">Password</label>
+        <input class="field-o" type="password" placeholder="Enter your password">
+      </div>
+      <div style="text-align:right;margin-bottom:24px;" class="a d3">
+        <button class="btn-txt">Forgot password?</button>
+      </div>
+      <button class="btn-f a d4" style="width:100%;height:48px;font-size:15px;" onclick="goTo('home')">
+        <span class="material-icons-round mi" style="font-size:20px;">login</span> Sign In
+      </button>
+      <div class="form-separator a d4">
+        <div class="sep-line"></div>
+        <span class="sep-text">or</span>
+        <div class="sep-line"></div>
+      </div>
+      <button class="btn-o a d5" style="width:100%;height:48px;font-size:15px;" onclick="goTo('otp')">
+        <span class="material-icons-round mi" style="font-size:20px;">sms</span> Register with OTP
+      </button>
+      <div class="secure-note a d6">
+        <span class="material-icons-round mi">lock</span>
+        <span>Secured with batch-based access control</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 2 — OTP
+  ══════════════════════════════════════════ -->
+  <div class="screen" id="s-otp">
+    <div class="status"><span class="status-t">9:41</span><div class="status-r"><span class="material-icons-round mi">signal_cellular_alt</span><span class="material-icons-round mi">wifi</span><span class="material-icons-round mi">battery_full</span></div></div>
+    <div class="top-app-bar">
+      <button class="ib" onclick="goTo('login')"><span class="material-icons-round mi">arrow_back</span></button>
+      <span class="tab-title">Verify Number</span>
+    </div>
+    <div class="scroll">
+      <div style="padding:var(--sp-6) var(--sp-8) 0;" class="a d1">
+        <p style="font-family:var(--font-body);font-size:15px;color:var(--color-on-surface-med);margin-bottom:4px;">Enter the 6-digit code sent to</p>
+        <p style="font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--color-on-surface);">+94 76 123 4567</p>
+      </div>
+      <div class="otp-row a d2">
+        <input class="otp-b" maxlength="1" value="4">
+        <input class="otp-b" maxlength="1" value="8">
+        <input class="otp-b" maxlength="1">
+        <input class="otp-b" maxlength="1">
+        <input class="otp-b" maxlength="1">
+        <input class="otp-b" maxlength="1">
+      </div>
+      <div style="padding:0 var(--sp-8);" class="a d3">
+        <button class="btn-f a" style="width:100%;height:48px;font-size:15px;" onclick="goTo('home')">Verify &amp; Continue</button>
+        <p style="text-align:center;font-size:14px;color:var(--color-on-surface-low);margin-top:var(--sp-4);">Didn't receive it? <button class="btn-txt" style="font-size:14px;padding:0;">Resend in 45s</button></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 3 — HOME FEED
+  ══════════════════════════════════════════ -->
+  <div class="screen" id="s-home">
+    <div class="status" style="background:var(--color-surface);">
+      <span class="status-t">9:41</span>
+      <div class="status-r"><span class="material-icons-round mi">signal_cellular_alt</span><span class="material-icons-round mi">wifi</span><span class="material-icons-round mi">battery_full</span></div>
+    </div>
+    <div class="top-app-bar">
+      <span class="tab-title">Batch 2026</span>
+      <div style="position:relative;">
+        <button class="ib" onclick="goTo('notifs')"><span class="material-icons-round mi">notifications_none</span></button>
+        <div class="ib-badge"></div>
+      </div>
+      <button class="ib"><span class="material-icons-round mi">more_vert</span></button>
+    </div>
+    <div class="scroll" style="padding-bottom:80px;">
+
+      <!-- Hero -->
+      <div class="hero a d0">
+        <div class="hero-sup">
+          <span class="material-icons-round mi">corporate_fare</span>University of Colombo · IT Faculty
+        </div>
+        <div class="hero-title">Batch 2026 Community</div>
+        <div class="hero-stats">
+          <div><div class="h-stat-n">142</div><div class="h-stat-l">Members</div></div>
+          <div><div class="h-stat-n">38</div><div class="h-stat-l">Online</div></div>
+          <div><div class="h-stat-n">3</div><div class="h-stat-l">Events</div></div>
+        </div>
+      </div>
+
+      <!-- Quick Access -->
+      <div class="sec-lbl a d1">Quick Access</div>
+      <div class="qa-grid a d1">
+        <div class="qa-item" onclick="goTo('directory')">
+          <div class="qa-icon"><span class="material-icons-round mi">contacts</span></div>
+          <span class="qa-lbl">Directory</span>
+        </div>
+        <div class="qa-item" onclick="goTo('chat')">
+          <div class="qa-icon"><span class="material-icons-round mi">chat_bubble_outline</span></div>
+          <span class="qa-lbl">Messages</span>
+        </div>
+        <div class="qa-item">
+          <div class="qa-icon"><span class="material-icons-round mi">event</span></div>
+          <span class="qa-lbl">Events</span>
+        </div>
+        <div class="qa-item">
+          <div class="qa-icon"><span class="material-icons-round mi">photo_library</span></div>
+          <span class="qa-lbl">Memories</span>
+        </div>
+      </div>
+
+      <!-- Birthday -->
+      <div class="bday-card a d2">
+        <div class="bday-head">
+          <span class="material-icons-round mi">cake</span>
+          <span class="bday-head-t">Birthdays Today</span>
+        </div>
+        <div class="bday-row">
+          <div class="av av-36 av-purple">KP</div>
+          <div style="flex:1;">
+            <div class="bday-name">Kavinda Perera</div>
+            <div class="bday-sub">Turning 26 today</div>
+          </div>
+          <button class="btn-t" style="height:32px;padding:0 14px;font-size:12px;background:rgba(163,92,0,0.12);color:var(--color-warning);">
+            <span class="material-icons-round mi" style="font-size:15px;">celebration</span> Wish
+          </button>
+        </div>
+        <div class="bday-row">
+          <div class="av av-36 av-green">NS</div>
+          <div style="flex:1;">
+            <div class="bday-name">Nimasha Silva</div>
+            <div class="bday-sub">Turning 25 today</div>
+          </div>
+          <button class="btn-t" style="height:32px;padding:0 14px;font-size:12px;background:rgba(163,92,0,0.12);color:var(--color-warning);">
+            <span class="material-icons-round mi" style="font-size:15px;">celebration</span> Wish
+          </button>
+        </div>
+      </div>
+
+      <!-- Posts header -->
+      <div class="sec-lbl a d3">Recent Posts</div>
+
+      <!-- Post 1 -->
+      <div class="card a d3">
+        <div class="post-head">
+          <div class="av av-40 av-purple">KP</div>
+          <div style="flex:1;">
+            <div class="post-author">Kavinda Perera</div>
+            <div class="post-meta">Senior Software Engineer at WSO2 · 2h ago</div>
+          </div>
+          <button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">more_horiz</span></button>
+        </div>
+        <div class="post-body">
+          <div class="post-tag">Career Update</div>
+          <p class="post-text" style="margin-top:8px;">Just received my promotion to Senior Software Engineer. Incredibly grateful for this batch — your support through every late-night project made this possible. Batch 2026, forever grateful.</p>
+        </div>
+        <div class="post-actions">
+          <button class="post-act liked">
+            <span class="material-icons-round mi">favorite</span> 48
+          </button>
+          <button class="post-act" onclick="goTo('chatdetail')">
+            <span class="material-icons-round mi">chat_bubble_outline</span> 12
+          </button>
+          <button class="post-act">
+            <span class="material-icons-round mi">share</span> Share
+          </button>
+        </div>
+      </div>
+
+      <!-- Post 2 -->
+      <div class="card a d4">
+        <div class="post-head">
+          <div class="av av-40 av-green">NS</div>
+          <div style="flex:1;">
+            <div class="post-author">Nimasha Silva</div>
+            <div class="post-meta">UX Designer at Dialog Axiata · 5h ago</div>
+          </div>
+          <button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">more_horiz</span></button>
+        </div>
+        <div class="post-img">
+          <div class="post-img-inner">
+            <span class="material-icons-round mi">landscape</span>
+            <span>Batch Reunion · Mirissa Beach</span>
+          </div>
+        </div>
+        <div class="post-body" style="padding-top:var(--sp-3);">
+          <div class="post-tag">Life Update</div>
+          <p class="post-text" style="margin-top:8px;">The batch reunion trip to Mirissa was exactly what we all needed. Four years and we still pick up right where we left off. Suggesting we make this an annual tradition.</p>
+        </div>
+        <div class="post-actions">
+          <button class="post-act"><span class="material-icons-round mi">favorite_border</span> 62</button>
+          <button class="post-act"><span class="material-icons-round mi">chat_bubble_outline</span> 28</button>
+          <button class="post-act"><span class="material-icons-round mi">share</span> Share</button>
+        </div>
+      </div>
+
+      <!-- SOS -->
+      <div class="sos-card a d5">
+        <div class="sos-icon-box"><span class="material-icons-round mi">emergency</span></div>
+        <div style="flex:1;">
+          <div class="sos-t">Emergency SOS</div>
+          <div class="sos-s">Instantly alert all 142 batch members in a crisis situation.</div>
+          <button class="btn-f" style="background:var(--color-danger);height:36px;font-size:13px;padding:0 var(--sp-4);">
+            <span class="material-icons-round mi" style="font-size:16px;">emergency</span> Send Alert
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <div class="nav-item on"><div class="nav-pill"><span class="material-icons-round mi">home</span></div><span class="nav-lbl">Home</span></div>
+      <div class="nav-item" onclick="goTo('directory')"><div class="nav-pill"><span class="material-icons-round mi">search</span></div><span class="nav-lbl">Directory</span></div>
+      <div class="nav-item" onclick="goTo('chat')"><div class="nav-pill"><span class="material-icons-round mi">chat_bubble_outline</span></div><span class="nav-lbl">Messages</span></div>
+      <div class="nav-item" onclick="goTo('notifs')"><div class="nav-pill"><span class="material-icons-round mi">notifications_none</span></div><span class="nav-lbl">Alerts</span></div>
+      <div class="nav-item" onclick="goTo('profile')"><div class="nav-pill"><span class="material-icons-round mi">person_outline</span></div><span class="nav-lbl">Profile</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 4 — DIRECTORY
+  ══════════════════════════════════════════ -->
+  <div class="screen" id="s-directory">
+    <div class="status"><span class="status-t">9:41</span><div class="status-r"><span class="material-icons-round mi">signal_cellular_alt</span><span class="material-icons-round mi">wifi</span><span class="material-icons-round mi">battery_full</span></div></div>
+    <div class="top-app-bar">
+      <span class="tab-title">Directory</span>
+      <button class="ib"><span class="material-icons-round mi">tune</span></button>
+    </div>
+    <div class="scroll" style="padding-bottom:80px;">
+      <div class="search-bar a d0"><span class="material-icons-round mi">search</span><input class="search-inp" placeholder="Search by name, role, or city…"><button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">mic</span></button></div>
+      <div class="chip-row a d1">
+        <div class="chip sel"><span class="material-icons-round mi">groups</span>All · 142</div>
+        <div class="chip"><span class="material-icons-round mi">code</span>Engineering</div>
+        <div class="chip"><span class="material-icons-round mi">brush</span>Design</div>
+        <div class="chip"><span class="material-icons-round mi">location_on</span>Colombo</div>
+        <div class="chip"><span class="material-icons-round mi">flight_takeoff</span>Abroad</div>
+      </div>
+      <div class="tab-row">
+        <button class="tab on">All Members</button>
+        <button class="tab">Online Now</button>
+        <button class="tab">New Joins</button>
+      </div>
+      <div class="div"></div>
+
+      <!-- Members -->
+      <div class="li a d2" onclick="goTo('profile')">
+        <div style="position:relative;"><div class="av av-56 av-purple">KP</div><div class="online-dot"></div></div>
+        <div class="li-text">
+          <div class="li-head">Kavinda Perera</div>
+          <div class="li-sub" style="margin-bottom:5px;">Sr. Software Engineer · WSO2, Colombo</div>
+          <div style="display:flex;gap:6px;"><span class="skill">Java</span><span class="skill">Spring Boot</span><span class="skill">AWS</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="ib" style="width:36px;height:36px;" onclick="event.stopPropagation();goTo('chatdetail')"><span class="material-icons-round mi" style="font-size:20px;">chat_bubble_outline</span></button>
+          <button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">person_outline</span></button>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d2">
+        <div class="av av-56 av-green">NS</div>
+        <div class="li-text">
+          <div class="li-head">Nimasha Silva</div>
+          <div class="li-sub" style="margin-bottom:5px;">UX Designer · Dialog Axiata, Kandy</div>
+          <div style="display:flex;gap:6px;"><span class="skill">Figma</span><span class="skill">Prototyping</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="ib" style="width:36px;height:36px;" onclick="goTo('chatdetail')"><span class="material-icons-round mi" style="font-size:20px;">chat_bubble_outline</span></button>
+          <button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">person_outline</span></button>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d3">
+        <div class="av av-56 av-amber">AF</div>
+        <div class="li-text">
+          <div class="li-head">Ashan Fernando</div>
+          <div class="li-sub" style="margin-bottom:5px;">Data Analyst · Sysco LABS, Galle</div>
+          <div style="display:flex;gap:6px;"><span class="skill">Python</span><span class="skill">SQL</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="ib" style="width:36px;height:36px;" onclick="goTo('chatdetail')"><span class="material-icons-round mi" style="font-size:20px;">chat_bubble_outline</span></button>
+          <button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">person_outline</span></button>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d3">
+        <div class="av av-56 av-rose">TJ</div>
+        <div class="li-text">
+          <div class="li-head">Tharini Jayawardena</div>
+          <div class="li-sub" style="margin-bottom:5px;">Product Manager · Millennium IT</div>
+          <div style="display:flex;gap:6px;"><span class="skill">Agile</span><span class="skill">Roadmapping</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="ib" style="width:36px;height:36px;" onclick="goTo('chatdetail')"><span class="material-icons-round mi" style="font-size:20px;">chat_bubble_outline</span></button>
+          <button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">person_outline</span></button>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d4">
+        <div class="av av-56 av-sky">DW</div>
+        <div class="li-text">
+          <div class="li-head">Dulith Weerasinghe</div>
+          <div class="li-sub" style="margin-bottom:5px;">DevOps Engineer · IFS, United Kingdom</div>
+          <div style="display:flex;gap:6px;"><span class="skill">AWS</span><span class="skill">Kubernetes</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="ib" style="width:36px;height:36px;" onclick="goTo('chatdetail')"><span class="material-icons-round mi" style="font-size:20px;">chat_bubble_outline</span></button>
+          <button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">person_outline</span></button>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d4">
+        <div class="av av-56 av-indigo">MG</div>
+        <div class="li-text">
+          <div class="li-head">Malsha Gunasekara</div>
+          <div class="li-sub" style="margin-bottom:5px;">QA Engineer · hSenid Mobile, Colombo</div>
+          <div style="display:flex;gap:6px;"><span class="skill">Selenium</span><span class="skill">Cypress</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="ib" style="width:36px;height:36px;" onclick="goTo('chatdetail')"><span class="material-icons-round mi" style="font-size:20px;">chat_bubble_outline</span></button>
+          <button class="ib" style="width:36px;height:36px;"><span class="material-icons-round mi" style="font-size:20px;">person_outline</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="goTo('home')"><div class="nav-pill"><span class="material-icons-round mi">home</span></div><span class="nav-lbl">Home</span></div>
+      <div class="nav-item on"><div class="nav-pill"><span class="material-icons-round mi">search</span></div><span class="nav-lbl">Directory</span></div>
+      <div class="nav-item" onclick="goTo('chat')"><div class="nav-pill"><span class="material-icons-round mi">chat_bubble_outline</span></div><span class="nav-lbl">Messages</span></div>
+      <div class="nav-item" onclick="goTo('notifs')"><div class="nav-pill"><span class="material-icons-round mi">notifications_none</span></div><span class="nav-lbl">Alerts</span></div>
+      <div class="nav-item" onclick="goTo('profile')"><div class="nav-pill"><span class="material-icons-round mi">person_outline</span></div><span class="nav-lbl">Profile</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 5 — MESSAGES LIST
+  ══════════════════════════════════════════ -->
+  <div class="screen" id="s-chat">
+    <div class="status"><span class="status-t">9:41</span><div class="status-r"><span class="material-icons-round mi">signal_cellular_alt</span><span class="material-icons-round mi">wifi</span><span class="material-icons-round mi">battery_full</span></div></div>
+    <div class="top-app-bar">
+      <span class="tab-title">Messages</span>
+      <button class="ib"><span class="material-icons-round mi">edit_square</span></button>
+    </div>
+    <div class="scroll" style="padding-bottom:80px;">
+      <div class="search-bar a d0"><span class="material-icons-round mi">search</span><input class="search-inp" placeholder="Search conversations…"></div>
+      <div class="sec-lbl">Pinned</div>
+      <div class="li a d1" onclick="goTo('chatdetail')">
+        <div class="av av-48 av-purple av-group"><span class="material-icons-round mi" style="font-size:22px;color:var(--color-primary);">school</span></div>
+        <div class="li-text"><div class="li-head">Batch 2026 — Official</div><div class="li-sub">Kavinda: There's an open role at WSO2 — check the pinned message.</div></div>
+        <div class="li-trail"><span class="li-time">Now</span><span class="badge">12</span></div>
+      </div>
+      <div class="div"></div>
+      <div class="sec-lbl">Recent</div>
+      <div class="li a d2" onclick="goTo('chatdetail')">
+        <div style="position:relative;"><div class="av av-48 av-green">NS</div><div class="online-dot"></div></div>
+        <div class="li-text"><div class="li-head">Nimasha Silva</div><div class="li-sub">The trip was exactly what I needed, honestly.</div></div>
+        <div class="li-trail"><span class="li-time">10m</span><span class="badge">3</span></div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d2" onclick="goTo('chatdetail')">
+        <div class="av av-48 av-amber">AF</div>
+        <div class="li-text"><div class="li-head">Ashan Fernando</div><div class="li-sub">Confirmed. See you at 6 PM.</div></div>
+        <div class="li-trail"><span class="li-time">1h</span></div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d3" onclick="goTo('chatdetail')">
+        <div class="av av-48 av-rose av-group"><span class="material-icons-round mi" style="font-size:22px;color:var(--color-danger);">groups</span></div>
+        <div class="li-text"><div class="li-head">CS Core Study Group</div><div class="li-sub">Tharini: Event venue confirmed for Saturday.</div></div>
+        <div class="li-trail"><span class="li-time">2h</span><span class="badge">7</span></div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d3" onclick="goTo('chatdetail')">
+        <div class="av av-48 av-sky">DW</div>
+        <div class="li-text"><div class="li-head">Dulith Weerasinghe</div><div class="li-sub">Files sent. Check your email when you get a chance.</div></div>
+        <div class="li-trail"><span class="li-time">Yesterday</span></div>
+      </div>
+      <div class="div-i"></div>
+      <div class="li a d4" onclick="goTo('chatdetail')">
+        <div class="av av-48 av-rose">TJ</div>
+        <div class="li-text"><div class="li-head">Tharini Jayawardena</div><div class="li-sub">Do you still have the project proposal?</div></div>
+        <div class="li-trail"><span class="li-time">Mon</span></div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="goTo('home')"><div class="nav-pill"><span class="material-icons-round mi">home</span></div><span class="nav-lbl">Home</span></div>
+      <div class="nav-item" onclick="goTo('directory')"><div class="nav-pill"><span class="material-icons-round mi">search</span></div><span class="nav-lbl">Directory</span></div>
+      <div class="nav-item on"><div class="nav-pill"><span class="material-icons-round mi">chat_bubble</span></div><span class="nav-lbl">Messages</span></div>
+      <div class="nav-item" onclick="goTo('notifs')"><div class="nav-pill"><span class="material-icons-round mi">notifications_none</span></div><span class="nav-lbl">Alerts</span></div>
+      <div class="nav-item" onclick="goTo('profile')"><div class="nav-pill"><span class="material-icons-round mi">person_outline</span></div><span class="nav-lbl">Profile</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 6 — CHAT DETAIL
+  ══════════════════════════════════════════ -->
+  <div class="screen" id="s-chatdetail">
+    <div class="status" style="background:var(--color-surface);"><span class="status-t">9:41</span><div class="status-r"><span class="material-icons-round mi">signal_cellular_alt</span><span class="material-icons-round mi">wifi</span><span class="material-icons-round mi">battery_full</span></div></div>
+    <div class="msg-top">
+      <button class="ib" onclick="goTo('chat')"><span class="material-icons-round mi">arrow_back</span></button>
+      <div style="position:relative;"><div class="av av-40 av-green">NS</div><div class="online-dot"></div></div>
+      <div style="flex:1;padding:0 var(--sp-2);">
+        <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--color-on-surface);">Nimasha Silva</div>
+        <div style="font-family:var(--font-body);font-size:12px;font-weight:500;color:var(--color-success);">Active now</div>
+      </div>
+      <button class="ib"><span class="material-icons-round mi">call</span></button>
+      <button class="ib"><span class="material-icons-round mi">more_vert</span></button>
+    </div>
+    <div class="msg-area">
+      <div class="date-sep">Today</div>
+      <div class="bubble r">Did you see Kavinda's post about the promotion?</div>
+      <div class="bub-t">9:12 AM</div>
+      <div class="bubble s">Yes, so well deserved. That project he led in third year was genuinely impressive.</div>
+      <div class="bub-t sr">9:14 AM · Delivered</div>
+      <div class="bubble r">Completely agree. Are you coming to the batch reunion next month?</div>
+      <div class="bub-t">9:15 AM</div>
+      <div class="bubble s">Absolutely. I was actually thinking we should do Mirissa again. The last trip was perfect.</div>
+      <div class="bub-t sr">9:22 AM · Delivered</div>
+      <div class="bubble r">Same thought. I'll create an event on BatchConnect so everyone can RSVP properly.</div>
+      <div class="bub-t">9:38 AM</div>
+    </div>
+    <div class="msg-compose">
+      <button class="ib"><span class="material-icons-round mi">add_circle_outline</span></button>
+      <input class="compose-field" placeholder="Message Nimasha…">
+      <button class="ib"><span class="material-icons-round mi">sentiment_satisfied_alt</span></button>
+      <button class="send-btn"><span class="material-icons-round mi">send</span></button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 7 — NOTIFICATIONS
+  ══════════════════════════════════════════ -->
+  <div class="screen" id="s-notifs">
+    <div class="status"><span class="status-t">9:41</span><div class="status-r"><span class="material-icons-round mi">signal_cellular_alt</span><span class="material-icons-round mi">wifi</span><span class="material-icons-round mi">battery_full</span></div></div>
+    <div class="top-app-bar">
+      <span class="tab-title">Notifications</span>
+      <button class="btn-txt">Mark all read</button>
+    </div>
+    <div class="scroll" style="padding-bottom:80px;">
+      <div class="tab-row">
+        <button class="tab on">All</button>
+        <button class="tab">Birthdays</button>
+        <button class="tab">Posts</button>
+        <button class="tab">Events</button>
+      </div>
+      <div class="sec-lbl">Today</div>
+      <div class="notif unread a d1">
+        <div class="notif-icon n-bday"><span class="material-icons-round mi">cake</span></div>
+        <div class="notif-body">
+          <div class="notif-text"><strong>Kavinda Perera</strong>'s birthday is today. Send a message to celebrate with him.</div>
+          <div class="notif-time">Just now</div>
+          <button class="btn-t" style="height:32px;padding:0 14px;font-size:12px;margin-top:10px;background:rgba(163,92,0,0.12);color:var(--color-warning);">
+            <span class="material-icons-round mi" style="font-size:15px;">celebration</span> Send Birthday Wish
+          </button>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="notif unread a d2">
+        <div class="notif-icon n-msg"><span class="material-icons-round mi">chat_bubble</span></div>
+        <div class="notif-body">
+          <div class="notif-text"><strong>Nimasha Silva</strong> sent you a message in the Batch 2026 group.</div>
+          <div class="notif-time">10 minutes ago</div>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="notif unread a d2">
+        <div class="notif-icon n-like"><span class="material-icons-round mi">favorite</span></div>
+        <div class="notif-body">
+          <div class="notif-text"><strong>Kavinda Perera</strong>'s career update received 48 reactions from batch members.</div>
+          <div class="notif-time">2 hours ago</div>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="notif a d3">
+        <div class="notif-icon n-event"><span class="material-icons-round mi">event</span></div>
+        <div class="notif-body">
+          <div class="notif-text">Batch Reunion 2026 event has been created. RSVP closes Friday.</div>
+          <div class="notif-time">4 hours ago</div>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="sec-lbl">Yesterday</div>
+      <div class="notif a d4">
+        <div class="notif-icon n-bday"><span class="material-icons-round mi">favorite</span></div>
+        <div class="notif-body">
+          <div class="notif-text"><strong>Tharini Jayawardena</strong> and her husband are celebrating their 3rd wedding anniversary.</div>
+          <div class="notif-time">Yesterday · 8:00 AM</div>
+          <button class="btn-t" style="height:32px;padding:0 14px;font-size:12px;margin-top:10px;background:rgba(163,92,0,0.12);color:var(--color-warning);">
+            <span class="material-icons-round mi" style="font-size:15px;">card_giftcard</span> Send Wishes
+          </button>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="notif a d5">
+        <div class="notif-icon n-ok"><span class="material-icons-round mi">check_circle</span></div>
+        <div class="notif-body">
+          <div class="notif-text">Emergency SOS drill completed. All 142 batch members responded within 4 minutes.</div>
+          <div class="notif-time">Yesterday · 2:30 PM</div>
+        </div>
+      </div>
+      <div class="div-i"></div>
+      <div class="notif a d5">
+        <div class="notif-icon n-like"><span class="material-icons-round mi">thumb_up</span></div>
+        <div class="notif-body">
+          <div class="notif-text"><strong>Dulith</strong> and 11 others reacted to your Mirissa reunion post.</div>
+          <div class="notif-time">2 days ago</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-item" onclick="goTo('home')"><div class="nav-pill"><span class="material-icons-round mi">home</span></div><span class="nav-lbl">Home</span></div>
+      <div class="nav-item" onclick="goTo('directory')"><div class="nav-pill"><span class="material-icons-round mi">search</span></div><span class="nav-lbl">Directory</span></div>
+      <div class="nav-item" onclick="goTo('chat')"><div class="nav-pill"><span class="material-icons-round mi">chat_bubble_outline</span></div><span class="nav-lbl">Messages</span></div>
+      <div class="nav-item on"><div class="nav-pill"><span class="material-icons-round mi">notifications</span></div><span class="nav-lbl">Alerts</span></div>
+      <div class="nav-item" onclick="goTo('profile')"><div class="nav-pill"><span class="material-icons-round mi">person_outline</span></div><span class="nav-lbl">Profile</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SCREEN 8 — PROFILE
+  ══════════════════════════════════════════ -->
+  <div class="screen" id="s-profile">
+    <div class="status" style="position:absolute;top:0;left:0;right:0;z-index:10;background:transparent;">
+      <span class="status-t" style="color:#fff;">9:41</span>
+      <div class="status-r"><span class="material-icons-round mi" style="color:#fff;">signal_cellular_alt</span><span class="material-icons-round mi" style="color:#fff;">wifi</span><span class="material-icons-round mi" style="color:#fff;">battery_full</span></div>
+    </div>
+    <div class="scroll" style="padding-bottom:80px;">
+      <div class="cover">
+        <div class="cover-av">
+          <div class="av av-88" style="background:#fff;">
+            <div class="av av-88 av-purple">CD</div>
+          </div>
+        </div>
+        <div class="cover-edit">
+          <button class="btn-t" style="height:36px;padding:0 16px;font-size:13px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);">
+            <span class="material-icons-round mi" style="font-size:16px;">edit</span> Edit Profile
+          </button>
+        </div>
+      </div>
+      <div class="profile-body a d0">
+        <div class="prof-name">Chanuka Dissanayake</div>
+        <div class="prof-role">UI/UX Designer · Frontend Developer · QA Engineer</div>
+        <div class="prof-bio">Passionate about crafting purposeful digital experiences. Building BatchConnect with React Native. Open to collaborations within the batch.</div>
+        <div class="prof-chips">
+          <div class="prof-chip"><span class="material-icons-round mi">location_on</span>Colombo, Sri Lanka</div>
+          <div class="prof-chip"><span class="material-icons-round mi">work</span>hSenid Mobile</div>
+          <div class="prof-chip"><span class="material-icons-round mi">school</span>IT Faculty · 2026</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-cell"><div class="stat-n">142</div><div class="stat-l">Batchmates</div></div>
+          <div class="stat-cell"><div class="stat-n">28</div><div class="stat-l">Posts</div></div>
+          <div class="stat-cell"><div class="stat-n">96</div><div class="stat-l">Connections</div></div>
+        </div>
+      </div>
+
+      <!-- Personal Info -->
+      <div class="info-card a d1">
+        <div class="info-card-head">
+          <span class="material-icons-round mi">person_outline</span>
+          <span class="info-card-title">Personal Information</span>
+        </div>
+        <div class="info-row">
+          <div class="info-icon"><span class="material-icons-round mi">phone</span></div>
+          <div><div class="info-lbl">Phone</div><div class="info-val">+94 76 123 4567</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon"><span class="material-icons-round mi">mail_outline</span></div>
+          <div><div class="info-lbl">Email</div><div class="info-val">chanuka@gmail.com</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon"><span class="material-icons-round mi">cake</span></div>
+          <div><div class="info-lbl">Date of Birth</div><div class="info-val">March 15, 1999</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon"><span class="material-icons-round mi">home</span></div>
+          <div><div class="info-lbl">Hometown</div><div class="info-val">Kandy, Sri Lanka</div></div>
+        </div>
+      </div>
+
+      <!-- Professional -->
+      <div class="info-card a d2">
+        <div class="info-card-head">
+          <span class="material-icons-round mi">business_center</span>
+          <span class="info-card-title">Professional Details</span>
+        </div>
+        <div class="info-row">
+          <div class="info-icon"><span class="material-icons-round mi">apartment</span></div>
+          <div><div class="info-lbl">Current Company</div><div class="info-val">hSenid Mobile Solutions</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon"><span class="material-icons-round mi">badge</span></div>
+          <div><div class="info-lbl">Role</div><div class="info-val">UI/UX Designer &amp; QA Tester</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon"><span class="material-icons-round mi">code</span></div>
+          <div><div class="info-lbl">Skills</div><div class="info-val">React Native · Figma · PHP / Laravel</div></div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon"><span class="material-icons-round mi">link</span></div>
+          <div><div class="info-lbl">LinkedIn</div><div class="info-val" style="color:var(--color-primary);">linkedin.com/in/chanuka</div></div>
+        </div>
+      </div>
+
+      <!-- Privacy -->
+      <div class="info-card a d3">
+        <div class="info-card-head">
+          <span class="material-icons-round mi">lock_outline</span>
+          <span class="info-card-title">Privacy Controls</span>
+        </div>
+        <div class="set-row">
+          <div class="set-icon"><span class="material-icons-round mi">phone</span></div>
+          <div class="set-text"><div class="set-t">Phone number visible to batch</div><div class="set-s">Members can see your contact number</div></div>
+          <button class="sw" onclick="this.classList.toggle('off')"></button>
+        </div>
+        <div class="set-row">
+          <div class="set-icon"><span class="material-icons-round mi">location_on</span></div>
+          <div class="set-text"><div class="set-t">Show location in directory</div><div class="set-s">Display your city on your public profile</div></div>
+          <button class="sw" onclick="this.classList.toggle('off')"></button>
+        </div>
+        <div class="set-row">
+          <div class="set-icon"><span class="material-icons-round mi">family_restroom</span></div>
+          <div class="set-text"><div class="set-t">Family information visible</div><div class="set-s">Share family details with batchmates</div></div>
+          <button class="sw off" onclick="this.classList.toggle('off')"></button>
+        </div>
+        <div class="set-row">
+          <div class="set-icon"><span class="material-icons-round mi">work</span></div>
+          <div class="set-text"><div class="set-t">Professional details searchable</div><div class="set-s">Appear in directory role filters</div></div>
+          <button class="sw" onclick="this.classList.toggle('off')"></button>
+        </div>
+      </div>
+    </div>
+    <div class="nav-bar" style="position:absolute;bottom:0;left:0;right:0;">
+      <div class="nav-item" onclick="goTo('home')"><div class="nav-pill"><span class="material-icons-round mi">home</span></div><span class="nav-lbl">Home</span></div>
+      <div class="nav-item" onclick="goTo('directory')"><div class="nav-pill"><span class="material-icons-round mi">search</span></div><span class="nav-lbl">Directory</span></div>
+      <div class="nav-item" onclick="goTo('chat')"><div class="nav-pill"><span class="material-icons-round mi">chat_bubble_outline</span></div><span class="nav-lbl">Messages</span></div>
+      <div class="nav-item" onclick="goTo('notifs')"><div class="nav-pill"><span class="material-icons-round mi">notifications_none</span></div><span class="nav-lbl">Alerts</span></div>
+      <div class="nav-item on"><div class="nav-pill"><span class="material-icons-round mi">person</span></div><span class="nav-lbl">Profile</span></div>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<p style="font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,0.25);letter-spacing:0.5px;">
+  BatchConnect · Material Design 3 · Plus Jakarta Sans · No emojis
+</p>
+
+<script>
+const screens = {
+  login:'s-login', otp:'s-otp', home:'s-home',
+  directory:'s-directory', chat:'s-chat', chatdetail:'s-chatdetail',
+  notifs:'s-notifs', profile:'s-profile'
+};
+function goTo(key){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
+  const id = screens[key];
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.display='flex';
+  requestAnimationFrame(()=>{ el.classList.add('active'); });
+  const sc = el.querySelector('.scroll');
+  if(sc) sc.scrollTop = 0;
+}
+/* Tabs */
+document.querySelectorAll('.tab-row').forEach(row=>{
+  row.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',function(){
+      row.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+      this.classList.add('on');
+    });
+  });
+});
+/* Chips */
+document.querySelectorAll('.chip-row').forEach(row=>{
+  row.querySelectorAll('.chip').forEach(c=>{
+    c.addEventListener('click',function(){
+      row.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));
+      this.classList.add('sel');
+    });
+  });
+});
+/* Like toggle */
+document.querySelectorAll('.post-act').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const ic = this.querySelector('.mi');
+    if(!ic) return;
+    if(ic.textContent==='favorite_border'){
+      ic.textContent='favorite'; this.classList.add('liked');
+    } else if(ic.textContent==='favorite'){
+      ic.textContent='favorite_border'; this.classList.remove('liked');
+    }
+  });
+});
+</script>
+</body>
+</html>
